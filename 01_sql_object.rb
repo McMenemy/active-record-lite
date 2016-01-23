@@ -78,6 +78,18 @@ class SQLObject
 
   def self.find(id)
 
+    datum = DBConnection.execute(<<-SQL)
+      SELECT
+        "#{self.table_name}".*
+      FROM
+        "#{self.table_name}"
+      WHERE
+        "#{self.table_name}".id = "#{id}"
+    SQL
+
+    return nil if datum.empty?
+
+    self.parse_all(datum)[0] 
   end
 
   def initialize(params = {})
