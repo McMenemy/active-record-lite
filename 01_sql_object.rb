@@ -105,7 +105,7 @@ class SQLObject
   end
 
   def attribute_values
-    # ...
+    @attributes.each_value
   end
 
   def insert
