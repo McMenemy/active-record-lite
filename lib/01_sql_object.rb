@@ -4,8 +4,16 @@ require 'active_support/inflector'
 # of this project. It was only a warm up.
 
 class SQLObject
-  def self.columns
+  attr_accessor :columns, :table_name, :attributes
 
+  def initialize(params = {})
+    params.each do |column, value|
+      raise "unknown attribute '#{column}'" unless self.class.columns.include?(column.to_sym)
+      send("#{column}=", value)
+    end
+  end
+
+  def self.columns
     if @columns.nil?
       column_str_array = DBConnection.execute2(<<-SQL)
         SELECT
@@ -49,7 +57,6 @@ class SQLObject
   end
 
   def self.all
-
     all_hashes = DBConnection.execute(<<-SQL)
       SELECT
         "#{self.table_name}".*
@@ -77,7 +84,6 @@ class SQLObject
   end
 
   def self.find(id)
-
     datum = DBConnection.execute(<<-SQL)
       SELECT
         "#{self.table_name}".*
@@ -92,20 +98,12 @@ class SQLObject
     self.parse_all(datum)[0]
   end
 
-  def initialize(params = {})
-    params.each do |column, value|
-      p self.class.columns
-      raise "unknown attribute '#{column}'" unless self.class.columns.include?(column.to_sym)
-      send("#{column}=", value)
-    end
-  end
-
   def attributes
     @attributes ||= {}
   end
 
   def attribute_values
-    @attributes.each_value
+    @attributes.values
   end
 
   def insert
@@ -123,6 +121,3 @@ end
 
 class Cat < SQLObject
 end
-
-# p Cat.table_name
-p Cat.columns
