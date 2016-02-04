@@ -11,7 +11,7 @@ class SQLObject
         SELECT
           *
         FROM
-          cats
+          "#{self.table_name}"
       SQL
 
       @columns = []
@@ -89,15 +89,15 @@ class SQLObject
 
     return nil if datum.empty?
 
-    self.parse_all(datum)[0] 
+    self.parse_all(datum)[0]
   end
 
   def initialize(params = {})
-    params.each do |column, value| 
+    params.each do |column, value|
       p self.class.columns
       raise "unknown attribute '#{column}'" unless self.class.columns.include?(column.to_sym)
       send("#{column}=", value)
-    end  
+    end
   end
 
   def attributes
